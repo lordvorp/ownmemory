@@ -41,6 +41,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Local git worktrees
+.worktrees/
+
 # OwnMemory local data (never commit user memories / models)
 .ownmemory/
 data/
