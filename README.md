@@ -78,6 +78,11 @@ npm run mcp
 
 Agent behavior for this workspace is also steered by `.cursor/rules/ownmemory.mdc`.
 
+## Connectors
+
+- [OpenClaw](connectors/openclaw) — memory plugin with recall, store, forget, and turn hooks.
+- [Open WebUI](connectors/openwebui) — a Workspace tool plus a filter that call this same HTTP API.
+
 ### MCP tools (Supermemory-shaped)
 
 - **`memory`** — `{ content, action?: "save"|"forget", containerTag? }`
