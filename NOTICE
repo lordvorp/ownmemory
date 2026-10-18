@@ -1,0 +1,18 @@
+OwnMemory
+Copyright (C) 2026 Rob Bloodgood
+
+The original OwnMemory program is licensed under the GNU General Public
+License, version 2 only. See the LICENSE file for the complete terms.
+SPDX-License-Identifier: GPL-2.0-only
+
+Third-party material
+--------------------
+
+The files under src/components/ui/ were generated from the shadcn/ui
+registry (https://ui.shadcn.com). Those files remain available under the
+MIT License. Their presence in this repository does not relicense them,
+and the GPL version 2 grant in the source headers does not apply to them.
+
+Dependencies declared in package.json and connectors/openclaw/package.json
+are distributed under the licenses chosen by their authors. Those licenses
+are not changed by building or running OwnMemory.

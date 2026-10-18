@@ -1,5 +1,7 @@
 # OpenClaw connector
 
+Copyright (C) 2026 Rob Bloodgood. Licensed under the GNU General Public License, version 2 only. See the repository [LICENSE](../../LICENSE).
+
 Memory plugin for OpenClaw. It calls a running OwnMemory server at `http://127.0.0.1:47321` (override with `baseUrl` or `OWNMEMORY_BASE_URL`).
 
 On first load, `index.js` runs `npm install` in this folder if `typebox` is not already resolvable, then `require`s `typebox@1.3.27` from this package. OpenClaw itself still provides `openclaw/plugin-sdk`.

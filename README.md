@@ -132,4 +132,14 @@ Those are optional layers. The core loop — **remember → recall → forget on
 
 ## License
 
-MIT — you own the silicon; you own the bits.
+OwnMemory is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License, version 2, as published by the Free Software Foundation. The license is **GPL-2.0-only**: version 2 applies, and later versions of the GNU GPL are not granted by this notice.
+
+OwnMemory is distributed in the hope that it will be useful, but without any warranty, without even the implied warranty of merchantability or fitness for a particular purpose. The full terms are in [LICENSE](LICENSE).
+
+Copyright (C) 2026 Rob Bloodgood.
+
+Each original source file carries the same copyright notice and the standard GPL version 2 grant. That notice is the boilerplate for this program. It is not a substitute for the license text.
+
+### Third-party material
+
+Packages listed in `package.json` remain under their own licenses. The interface primitives in `src/components/ui/` were generated from the shadcn/ui registry and remain available under the MIT License. Including those files in this tree does not relicense them. See [NOTICE](NOTICE).
