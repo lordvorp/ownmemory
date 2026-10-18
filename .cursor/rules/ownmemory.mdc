@@ -1,0 +1,19 @@
+---
+description: Use OwnMemory (local MCP) instead of cloud memory services
+alwaysApply: true
+---
+
+# OwnMemory
+
+Persistent memory for this workspace is **OwnMemory**, a local MCP server (not Supermemory).
+
+When the `ownmemory` MCP tools are available:
+
+- Call `recall` before inventing user preferences, prior decisions, or project conventions.
+- Call `memory` with `action: "save"` for durable facts, preferences, and decisions.
+- Call `memory` with `action: "forget"` when a fact is wrong or outdated.
+- Scope project-specific facts with `containerTag` (space name).
+- Use `whoAmI` / `listSpaces` when diagnosing the local store.
+
+Do not require or fall back to Supermemory / Mem0 cloud accounts for memory in this project.
+Data lives under `OWNMEMORY_DATA_DIR` (default `~/.ownmemory`).

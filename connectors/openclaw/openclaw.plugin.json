@@ -1,0 +1,28 @@
+{
+  "id": "openclaw-ownmemory",
+  "name": "Memory (OwnMemory)",
+  "description": "Local OwnMemory backend. Recalls relevant notes before a turn and stores the user message when a turn ends.",
+  "version": "0.1.0",
+  "kind": "memory",
+  "categories": ["memory"],
+  "activation": {
+    "onStartup": true
+  },
+  "contracts": {
+    "tools": ["memory_recall", "memory_store", "memory_forget"]
+  },
+  "toolMetadata": {
+    "memory_store": { "sideEffecting": true },
+    "memory_forget": { "sideEffecting": true }
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "baseUrl": { "type": "string" },
+      "space": { "type": "string" },
+      "autoRecall": { "type": "boolean" },
+      "autoCapture": { "type": "boolean" }
+    }
+  }
+}

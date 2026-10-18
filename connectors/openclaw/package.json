@@ -1,0 +1,16 @@
+{
+  "name": "openclaw-ownmemory",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "description": "OpenClaw memory plugin that stores and recalls context in the local OwnMemory server.",
+  "dependencies": {
+    "typebox": "1.3.27"
+  },
+  "openclaw": {
+    "extensions": ["./index.js"],
+    "compat": {
+      "pluginApi": ">=2026.9.4"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "ownmemory": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["${workspaceFolder}/bin/ownmemory-mcp.mjs"],
+      "env": {
+        "OWNMEMORY_DATA_DIR": "${userHome}/.ownmemory"
+      }
+    }
+  }
+}
