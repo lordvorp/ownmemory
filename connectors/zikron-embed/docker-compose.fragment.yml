@@ -1,0 +1,27 @@
+# Merge into /home/ubuntu/work/wp/docker-compose.yml or use:
+#   docker compose -f docker-compose.yml -f docker-compose.embed.yml up -d
+services:
+  embed:
+    build:
+      context: /home/ubuntu/work/ownmemory   # adjust to checkout path on janet
+      dockerfile: connectors/zikron-embed/Dockerfile
+    image: ownmemory-embed:local
+    restart: unless-stopped
+    environment:
+      EMBED_LISTEN: "0.0.0.0:8791"
+      OWNMEMORY_EMBEDDING_MODEL: Snowflake/snowflake-arctic-embed-s
+      OWNMEMORY_DATA_DIR: /data
+      TRANSFORMERS_CACHE: /data/models
+    volumes:
+      - embed_models:/data/models
+    mem_limit: 512m
+
+  php:
+    depends_on:
+      - embed
+    environment:
+      ZIKRON_EMBED_URL: http://embed:8791
+      ZIKRON_EMBED_GPU_URL: http://cypher:11434
+
+volumes:
+  embed_models:
