@@ -29,7 +29,23 @@ type MemoryRow = {
   updated_at: string;
   forgotten: number;
   embedding: Buffer | null;
+  meta_type?: string | null;
+  pinned?: number | null;
+  branch?: string | null;
+  meta_json?: string | null;
 };
+
+function parseMetaJson(raw: string | null | undefined): Record<string, unknown> | null {
+  if (!raw) return null;
+  try {
+    const v = JSON.parse(raw) as unknown;
+    return v && typeof v === "object" && !Array.isArray(v)
+      ? (v as Record<string, unknown>)
+      : null;
+  } catch {
+    return null;
+  }
+}
 
 function mapMemory(row: MemoryRow): Memory {
   return {
@@ -40,12 +56,17 @@ function mapMemory(row: MemoryRow): Memory {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     forgotten: row.forgotten === 1,
+    metaType: row.meta_type ?? null,
+    pinned: (row.pinned ?? 0) === 1,
+    branch: row.branch ?? null,
+    meta: parseMetaJson(row.meta_json),
   };
 }
 
 const MEMORY_SELECT = `
   SELECT m.id, m.space_id, s.name AS space_name, m.content,
-         m.created_at, m.updated_at, m.forgotten, m.embedding
+         m.created_at, m.updated_at, m.forgotten, m.embedding,
+         m.meta_type, m.pinned, m.branch, m.meta_json
   FROM memories m
   JOIN spaces s ON s.id = m.space_id
 `;
@@ -299,4 +320,103 @@ export function hardDeleteMemory(id: string): boolean {
     return result.changes > 0;
   });
   return tx();
+}
+
+/** Additive 0.3: fetch one memory by id (including forgotten if present). */
+export function getMemoryById(id: string): Memory | null {
+  const row = getMemoryRow(id);
+  return row ? mapMemory(row) : null;
+}
+
+export type MemoryPatch = {
+  content?: string;
+  metaType?: string | null;
+  pinned?: boolean;
+  branch?: string | null;
+  meta?: Record<string, unknown> | null;
+};
+
+/** Additive 0.3: update by id; re-embeds only when content changes. */
+export async function updateMemoryById(
+  id: string,
+  patch: MemoryPatch,
+): Promise<Memory | null> {
+  const existing = getMemoryRow(id);
+  if (!existing || existing.forgotten === 1) return null;
+
+  const content =
+    patch.content !== undefined ? patch.content.trim() : existing.content;
+  if (!content) {
+    throw new Error("Memory content cannot be empty.");
+  }
+
+  const now = new Date().toISOString();
+  const metaType =
+    patch.metaType !== undefined ? patch.metaType : existing.meta_type ?? null;
+  const pinned =
+    patch.pinned !== undefined
+      ? patch.pinned
+        ? 1
+        : 0
+      : (existing.pinned ?? 0);
+  const branch =
+    patch.branch !== undefined ? patch.branch : existing.branch ?? null;
+  const metaJson =
+    patch.meta !== undefined
+      ? patch.meta
+        ? JSON.stringify(patch.meta)
+        : null
+      : existing.meta_json ?? null;
+
+  let embedding: Buffer | null = existing.embedding;
+  if (patch.content !== undefined && content !== existing.content) {
+    try {
+      embedding = float32ToBuffer(await embedText(content, "document"));
+    } catch {
+      embedding = existing.embedding;
+    }
+  }
+
+  const db = getDb();
+  const tx = db.transaction(() => {
+    db.prepare(
+      `UPDATE memories
+       SET content = ?, embedding = ?, updated_at = ?,
+           meta_type = ?, pinned = ?, branch = ?, meta_json = ?
+       WHERE id = ?`,
+    ).run(content, embedding, now, metaType, pinned, branch, metaJson, id);
+    db.prepare(`DELETE FROM memories_fts WHERE memory_id = ?`).run(id);
+    db.prepare(
+      `INSERT INTO memories_fts (memory_id, space_id, content) VALUES (?, ?, ?)`,
+    ).run(id, existing.space_id, content);
+  });
+  tx();
+
+  return getMemoryById(id);
+}
+
+/** Additive 0.3: soft-forget by id (same forgotten flag as forgetMemory). */
+export function forgetMemoryById(id: string): Memory | null {
+  const existing = getMemoryById(id);
+  if (!existing || existing.forgotten) return null;
+  const db = getDb();
+  const now = new Date().toISOString();
+  db.prepare(
+    `UPDATE memories SET forgotten = 1, updated_at = ? WHERE id = ?`,
+  ).run(now, id);
+  db.prepare(`DELETE FROM memories_fts WHERE memory_id = ?`).run(id);
+  return { ...existing, forgotten: true, updatedAt: now };
+}
+
+/** Additive 0.3: paginated list with total (wrapper around existing list). */
+export function listMemoriesPage(options?: {
+  containerTag?: string | null;
+  limit?: number;
+  offset?: number;
+}): { memories: Memory[]; total: number; limit: number; offset: number } {
+  const limit = options?.limit ?? 50;
+  const offset = options?.offset ?? 0;
+  const memories = listActiveMemories(options?.containerTag, limit, offset);
+  const total = countActiveMemories(options?.containerTag);
+  return { memories, total, limit, offset };
 }

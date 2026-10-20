@@ -30,6 +30,11 @@ export type Memory = {
   createdAt: string;
   updatedAt: string;
   forgotten: boolean;
+  /** Optional structured fields (0.3+); absent/null on older rows */
+  metaType?: string | null;
+  pinned?: boolean;
+  branch?: string | null;
+  meta?: Record<string, unknown> | null;
 };
 
 export type ScoredMemory = Memory & {
@@ -53,6 +58,21 @@ export type WhoAmI = {
   dbPath: string;
   embeddingModel: string;
   embeddingReady: boolean;
+  embedderId?: string;
+  embedderLabel?: string;
+  reembedRequired?: boolean;
+  inferMode?: string;
+  /** Catalog id requested (may differ from embedderId when GPU gate falls back). */
+  requestedEmbedderId?: string;
+  gpuFallbackReason?: string | null;
+  embedDevice?: {
+    cudaAvailable: boolean;
+    reason: string;
+    gpuName: string | null;
+    vramTotalMiB: number | null;
+    vramFreeMiB: number | null;
+    vramHeadroomMiB: number;
+  } | null;
   spaces: Space[];
   totalMemories: number;
 };

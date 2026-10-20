@@ -1,6 +1,6 @@
 {
   "name": "ownmemory",
-  "version": "0.2.1",
+  "version": "0.3.1",
   "private": true,
   "license": "GPL-2.0-only",
   "description": "Local-first persistent memory for AI agents — SQLite, on-device embeddings, Cursor MCP",

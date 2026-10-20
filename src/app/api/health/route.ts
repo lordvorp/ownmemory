@@ -28,6 +28,8 @@ export const runtime = "nodejs";
 
 export async function GET() {
   ensureEngine();
+  const { probeEmbedDevice } = await import("@/lib/memory/device");
+  await probeEmbedDevice();
   const info = whoAmI();
   const mcpEntry = path.join(process.cwd(), "bin/ownmemory-mcp.mjs");
   return NextResponse.json({

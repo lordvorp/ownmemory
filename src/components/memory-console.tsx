@@ -45,6 +45,10 @@ type Health = {
   dbPath: string;
   embeddingModel: string;
   embeddingReady: boolean;
+  embedderId?: string;
+  embedderLabel?: string;
+  reembedRequired?: boolean;
+  inferMode?: string;
   totalMemories: number;
   embeddingError: string | null;
   mcp?: {
@@ -52,6 +56,38 @@ type Health = {
     args: string[];
     env?: Record<string, string>;
   };
+};
+
+type EmbedderProfile = {
+  id: string;
+  hfModel: string;
+  label: string;
+  description: string;
+  dims: number;
+  approxMB: number;
+  role: string;
+};
+
+type SettingsSnapshot = {
+  settings: {
+    embedderId: string;
+    reembedRequired: boolean;
+    infer: { mode: string };
+  };
+  activeEmbedder: EmbedderProfile;
+  activeSource: string;
+  envOverride: string | null;
+  requestedEmbedderId?: string;
+  gpuFallbackReason?: string | null;
+  embedDevice?: {
+    cudaAvailable: boolean;
+    reason: string;
+    gpuName: string | null;
+    vramTotalMiB: number | null;
+    vramFreeMiB: number | null;
+  } | null;
+  refused?: boolean;
+  catalog: EmbedderProfile[];
 };
 
 type SearchHit = Memory & {
@@ -70,28 +106,58 @@ export function MemoryConsole() {
   const [searchMode, setSearchMode] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
+  const [settings, setSettings] = useState<SettingsSnapshot | null>(null);
   const [pending, startTransition] = useTransition();
 
   const refresh = useCallback(async () => {
     setError(null);
-    const [healthRes, spacesRes, memRes] = await Promise.all([
+    const [healthRes, spacesRes, memRes, settingsRes] = await Promise.all([
       fetch("/api/health"),
       fetch("/api/spaces"),
       fetch(`/api/memories?space=${encodeURIComponent(space)}&limit=100`),
+      fetch("/api/settings"),
     ]);
 
-    if (!healthRes.ok || !spacesRes.ok || !memRes.ok) {
+    if (!healthRes.ok || !spacesRes.ok || !memRes.ok || !settingsRes.ok) {
       throw new Error("Failed to load OwnMemory state");
     }
 
     const healthJson = (await healthRes.json()) as Health;
     const spacesJson = (await spacesRes.json()) as { spaces: Space[] };
     const memJson = (await memRes.json()) as { memories: Memory[] };
+    const settingsJson = (await settingsRes.json()) as SettingsSnapshot;
 
     setHealth(healthJson);
     setSpaces(spacesJson.spaces);
     setMemories(memJson.memories);
+    setSettings(settingsJson);
   }, [space]);
+
+  async function onSelectEmbedder(embedderId: string) {
+    setError(null);
+    setStatus(null);
+    const res = await fetch("/api/settings", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ embedderId }),
+    });
+    const json = (await res.json()) as SettingsSnapshot & { error?: string };
+    if (!res.ok) {
+      setError(json.error ?? "Failed to update embedder");
+      return;
+    }
+    setSettings(json);
+    if (json.refused) {
+      setStatus(
+        `Kept ${json.activeEmbedder.label}. ${json.requestedEmbedderId ?? "GPU embedder"} needs CUDA: ${json.gpuFallbackReason ?? "unavailable"}`,
+      );
+    } else {
+      setStatus(
+        `Embedder set to ${json.activeEmbedder.label}. Run npm run reembed, then reload MCP (Ctrl+R).`,
+      );
+    }
+    await refresh();
+  }
 
   useEffect(() => {
     startTransition(() => {
@@ -398,26 +464,86 @@ export function MemoryConsole() {
           </ul>
 
           <div className="rounded-md border border-stone-200 bg-white/50 p-4 text-xs leading-relaxed text-stone-600">
-            <p className="mb-2 font-medium text-stone-800">Model</p>
-            <p>{health?.embeddingModel ?? "…"}</p>
-            <p className="mt-2 font-medium text-stone-800">Cursor MCP</p>
-            <pre className="mt-1 overflow-x-auto whitespace-pre-wrap text-[11px] text-stone-700">
-              {JSON.stringify(
-                {
-                  mcpServers: {
-                    ownmemory: health?.mcp ?? {
-                      command: "npx",
-                      args: ["tsx", "src/mcp/server.ts"],
-                    },
-                  },
-                },
-                null,
-                2,
+            <p className="mb-2 font-medium text-stone-800">Embedding model</p>
+            <p className="mb-3 text-stone-500">
+              Active:{" "}
+              <code className="text-[11px]">
+                {health?.embeddingModel ?? "…"}
+              </code>
+              {settings?.activeSource === "env" && (
+                <span className="ml-1 text-amber-800">
+                  (OWNMEMORY_EMBEDDING_MODEL override)
+                </span>
               )}
-            </pre>
-            <p className="mt-2">
-              Paste into <code>~/.cursor/mcp.json</code>. Restart Cursor MCP
-              after saving.
+            </p>
+            {(health?.reembedRequired || settings?.settings.reembedRequired) && (
+              <p className="mb-3 rounded border border-amber-200 bg-amber-50 px-2 py-1 text-amber-900">
+                Re-embed required after model change:{" "}
+                <code>npm run reembed</code>
+              </p>
+            )}
+            {settings?.gpuFallbackReason && (
+              <p className="mb-3 rounded border border-amber-200 bg-amber-50 px-2 py-1 text-amber-900">
+                GPU embedder unavailable — using{" "}
+                {settings.activeEmbedder.label}. {settings.gpuFallbackReason}
+              </p>
+            )}
+            {settings?.embedDevice && (
+              <p className="mb-3 text-[11px] text-stone-500">
+                CUDA:{" "}
+                {settings.embedDevice.cudaAvailable ? "yes" : "no"}
+                {settings.embedDevice.gpuName
+                  ? ` · ${settings.embedDevice.gpuName}`
+                  : ""}
+                {settings.embedDevice.vramFreeMiB != null
+                  ? ` · ${settings.embedDevice.vramFreeMiB}MiB free`
+                  : ""}
+              </p>
+            )}
+            <fieldset
+              className="space-y-2"
+              disabled={Boolean(settings?.envOverride) || pending}
+            >
+              <legend className="sr-only">Select embedder</legend>
+              {(settings?.catalog ?? []).map((opt) => (
+                <label
+                  key={opt.id}
+                  className="flex cursor-pointer gap-2 rounded border border-stone-200/80 bg-white/70 px-2 py-2 hover:border-teal-700/40"
+                >
+                  <input
+                    type="radio"
+                    name="embedder"
+                    className="mt-1"
+                    checked={
+                      (settings?.settings.embedderId ?? health?.embedderId) ===
+                      opt.id
+                    }
+                    onChange={() => void onSelectEmbedder(opt.id)}
+                  />
+                  <span>
+                    <span className="block font-medium text-stone-800">
+                      {opt.label}{" "}
+                      <span className="font-normal text-stone-500">
+                        ~{opt.approxMB}MB · {opt.dims}-d
+                      </span>
+                    </span>
+                    <span className="block text-[11px] text-stone-500">
+                      {opt.description}
+                    </span>
+                  </span>
+                </label>
+              ))}
+            </fieldset>
+            <p className="mt-3 text-[11px] text-stone-500">
+              Infer extraction:{" "}
+              <code>{health?.inferMode ?? settings?.settings.infer.mode ?? "off"}</code>{" "}
+              (reserved — local Ollama/OpenAI-compatible or cloud later; unused
+              now).
+            </p>
+            <p className="mt-3 font-medium text-stone-800">Cursor plugin</p>
+            <p className="mt-1">
+              <code>npm run cursor:install</code> then enable{" "}
+              <strong>ownmemory</strong> in Settings → Plugins / MCP.
             </p>
           </div>
         </div>

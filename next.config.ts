@@ -6,6 +6,10 @@ const nextConfig: NextConfig = {
     "@xenova/transformers",
     "onnxruntime-node",
   ],
+  // Keep Turbopack rooted on this repo (parent /home/rob/work has its own lockfile).
+  turbopack: {
+    root: process.cwd(),
+  },
 };
 
 export default nextConfig;

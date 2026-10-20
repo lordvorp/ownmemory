@@ -66,5 +66,7 @@ export function ensureDataDirs(): void {
 }
 
 export const PRODUCT_NAME = "OwnMemory";
+
+/** @deprecated Prefer resolveActiveEmbedder() / getEmbeddingModelName(). */
 export const EMBEDDING_MODEL =
   process.env.OWNMEMORY_EMBEDDING_MODEL?.trim() || DEFAULT_EMBEDDING_MODEL;

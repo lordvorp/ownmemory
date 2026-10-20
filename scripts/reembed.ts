@@ -21,9 +21,33 @@
  * Operates on OWNMEMORY_DATA_DIR / OWNMEMORY_DB_PATH (default ~/.ownmemory).
  */
 import { float32ToBuffer, getDb } from "../src/lib/memory/db";
+import { probeEmbedDevice } from "../src/lib/memory/device";
 import { embedText, getEmbeddingModelName } from "../src/lib/memory/embed";
+import { resolveActiveEmbedder } from "../src/lib/memory/settings";
 
 async function main() {
+  const device = await probeEmbedDevice();
+  const resolved = resolveActiveEmbedder();
+  console.log(`model: ${getEmbeddingModelName()} (${resolved.profile.id})`);
+  console.log(
+    `device: cuda=${device.cudaAvailable}` +
+      (device.gpuName ? ` gpu=${device.gpuName}` : "") +
+      (device.vramFreeMiB != null
+        ? ` vramFree=${device.vramFreeMiB}MiB`
+        : ""),
+  );
+  console.log(`device note: ${device.reason}`);
+  if (resolved.gpuFallbackReason) {
+    console.error(
+      `refusing re-embed: requested ${resolved.requestedId} but active is ${resolved.profile.id}: ${resolved.gpuFallbackReason}`,
+    );
+    process.exit(2);
+  }
+  if (resolved.profile.role === "gpu" && !device.cudaAvailable) {
+    console.error("refusing re-embed: GPU-role model without CUDA");
+    process.exit(2);
+  }
+
   const db = getDb();
   const rows = db
     .prepare(
@@ -31,7 +55,6 @@ async function main() {
     )
     .all() as Array<{ id: string; content: string }>;
 
-  console.log(`model: ${getEmbeddingModelName()}`);
   console.log(`re-embedding ${rows.length} active memories…`);
 
   const update = db.prepare(

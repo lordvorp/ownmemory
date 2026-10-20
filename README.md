@@ -86,12 +86,16 @@ Optional host plugins — enable only what the machine uses:
 
 Mem0 packaging notes (local plugin cache audit): [docs/mem0-cursor-plugin-report.md](docs/mem0-cursor-plugin-report.md).
 
-### MCP tools (Supermemory-shaped)
+### MCP tools (Supermemory-shaped + 0.3 additive)
 
 - **`memory`** — `{ content, action?: "save"|"forget", containerTag? }`
 - **`recall`** — `{ query, includeProfile?, containerTag? }`
 - **`whoAmI`** — local status
 - **`listSpaces`** — list spaces
+- **`get_memory`** — `{ id }`
+- **`update_memory`** — `{ id, content?, metaType?, pinned?, branch?, meta? }`
+- **`delete_memory`** — `{ id, hard? }`
+- **`list_memories`** — `{ containerTag?, limit?, offset? }`
 
 Resources: `ownmemory://profile`, `ownmemory://projects`  
 Prompt: `context` — system-context injection text
@@ -112,10 +116,11 @@ Prompt: `context` — system-context injection text
 | --- | --- |
 | `OWNMEMORY_DATA_DIR` | Data root (default `~/.ownmemory`; leading `~` is expanded) |
 | `OWNMEMORY_DB_PATH` | Override DB file path (`~` expanded) |
-| `OWNMEMORY_EMBEDDING_MODEL` | Default `Snowflake/snowflake-arctic-embed-s` |
+| `OWNMEMORY_EMBEDDING_MODEL` | HF id override (wins over GUI/`settings.json`) |
 | `OWNMEMORY_OFFLINE=1` | Disallow remote model download |
+| `OWNMEMORY_ALLOW_GPU_CPU=1` | Allow Arctic-L on CPU (default: CUDA required) |
 
-First embedding run downloads arctic-embed-s (quantized ONNX, ~67MB) into `models/`. After that, recall works offline. If embeddings fail, **keyword (FTS5) search still works**. After changing the embedder, run `npm run reembed`.
+Default embedder is arctic-s (~67MB). GUI / `settings.json` can select MiniLM (~23MB fallback) or arctic-l (~1.3GB ONNX, 1024-d, **CUDA required** — otherwise falls back to arctic-s). Stock `@xenova/transformers` / `onnxruntime-node` is CPU-only; a CUDA EP build plus enough free VRAM is needed for Arctic-L. First use downloads weights into `models/`. After changing the embedder, run `npm run reembed` and reload MCP. If embeddings fail, **keyword (FTS5) search still works**.
 
 ## Architecture
 

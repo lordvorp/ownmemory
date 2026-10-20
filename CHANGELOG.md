@@ -2,6 +2,25 @@
 
 Versions live in `package.json`. Bump on **major**, **semi-major**, and **minor** release commits (see [AGENTS.md](AGENTS.md)).
 
+## 0.3.1 — 2026-10-20
+
+### Minor
+
+- Arctic-L is **CUDA-required**: onnxruntime CUDA EP + enough free VRAM, or selection/re-embed falls back to Arctic-S (CPU-only ORT and low-VRAM GPUs like Quadro M1000M refuse cleanly).
+- `whoAmI` / settings snapshot report `embedDevice`, `requestedEmbedderId`, and `gpuFallbackReason`.
+- `npm run reembed` prints device status and refuses a GPU-role re-embed when CUDA is unavailable.
+- Escape hatch: `OWNMEMORY_ALLOW_GPU_CPU=1` allows Arctic-L on CPU for experiments.
+
+## 0.3.0 — 2026-10-19
+
+### Semi-major (compatible)
+
+- Additive MCP/HTTP memory ops: `get_memory`, `update_memory`, `delete_memory`, `list_memories` (existing `memory` / `recall` / `whoAmI` / `listSpaces` unchanged).
+- Optional memory metadata columns: `meta_type`, `pinned`, `branch`, `meta_json` (NULL/0 on old rows).
+- Embedder catalog + GUI radio: **arctic-s** (default, ~67MB), **minilm** (fallback, ~23MB), **arctic-l** (GPU, ~669MB FP16). Stored in `~/.ownmemory/settings.json`; env `OWNMEMORY_EMBEDDING_MODEL` still overrides.
+- Infer settings stub (`mode: off | local | openai_compatible | cloud`) reserved — not used yet.
+- Changing embedder sets `reembedRequired`; run `npm run reembed` then reload MCP.
+
 ## 0.2.1 — 2026-10-19
 
 ### Minor

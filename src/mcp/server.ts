@@ -26,20 +26,25 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import {
+  deleteMemoryTool,
   ensureEngine,
   getContextPrompt,
+  getMemoryTool,
   getProfile,
+  listMemoriesTool,
   listSpaces,
   memoryTool,
   recallTool,
+  updateMemoryTool,
   whoAmI,
 } from "../lib/memory/engine";
+import { OWNMEMORY_VERSION } from "../lib/memory/version";
 
 ensureEngine();
 
 const server = new McpServer({
   name: "ownmemory",
-  version: "0.1.0",
+  version: OWNMEMORY_VERSION,
 });
 
 server.registerTool(
@@ -113,6 +118,8 @@ server.registerTool(
     inputSchema: {},
   },
   async () => {
+    const { probeEmbedDevice } = await import("../lib/memory/device");
+    await probeEmbedDevice();
     return {
       content: [
         {
@@ -138,6 +145,115 @@ server.registerTool(
         {
           type: "text" as const,
           text: JSON.stringify({ count: spaces.length, spaces }, null, 2),
+        },
+      ],
+    };
+  },
+);
+
+server.registerTool(
+  "get_memory",
+  {
+    title: "Get memory by id",
+    description:
+      "Fetch a single local memory by id. Additive 0.3 API; does not replace recall.",
+    inputSchema: {
+      id: z.string().describe("Memory UUID"),
+    },
+  },
+  async ({ id }) => {
+    const memory = getMemoryTool(id);
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: JSON.stringify({ memory }, null, 2),
+        },
+      ],
+    };
+  },
+);
+
+server.registerTool(
+  "update_memory",
+  {
+    title: "Update memory by id",
+    description:
+      "Update content and/or optional metadata (metaType, pinned, branch, meta). Re-embeds only when content changes.",
+    inputSchema: {
+      id: z.string(),
+      content: z.string().optional(),
+      metaType: z.string().nullable().optional(),
+      pinned: z.boolean().optional(),
+      branch: z.string().nullable().optional(),
+      meta: z.record(z.string(), z.unknown()).nullable().optional(),
+    },
+  },
+  async ({ id, content, metaType, pinned, branch, meta }) => {
+    const memory = await updateMemoryTool(id, {
+      content,
+      metaType,
+      pinned,
+      branch,
+      meta,
+    });
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: JSON.stringify({ memory }, null, 2),
+        },
+      ],
+    };
+  },
+);
+
+server.registerTool(
+  "delete_memory",
+  {
+    title: "Delete memory by id",
+    description:
+      "Soft-forget by id (default) or hard-delete when hard=true. Additive; forget-by-content still works.",
+    inputSchema: {
+      id: z.string(),
+      hard: z
+        .boolean()
+        .optional()
+        .describe("If true, permanently delete. Default soft-forget."),
+    },
+  },
+  async ({ id, hard }) => {
+    const result = deleteMemoryTool(id, hard === true);
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: JSON.stringify(result, null, 2),
+        },
+      ],
+    };
+  },
+);
+
+server.registerTool(
+  "list_memories",
+  {
+    title: "List memories (paginated)",
+    description:
+      "Paginated active memories for a space. Additive; does not replace recall search.",
+    inputSchema: {
+      containerTag: z.string().optional(),
+      limit: z.number().optional(),
+      offset: z.number().optional(),
+    },
+  },
+  async ({ containerTag, limit, offset }) => {
+    const page = listMemoriesTool({ containerTag, limit, offset });
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: JSON.stringify(page, null, 2),
         },
       ],
     };

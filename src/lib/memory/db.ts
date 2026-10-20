@@ -21,6 +21,25 @@ import { ensureDataDirs, getDbPath } from "./paths";
 
 let db: Database.Database | null = null;
 
+function migrateColumns(instance: Database.Database): void {
+  const cols = new Set(
+    (
+      instance.prepare(`PRAGMA table_info(memories)`).all() as Array<{
+        name: string;
+      }>
+    ).map((c) => c.name),
+  );
+  const add = (name: string, ddl: string) => {
+    if (!cols.has(name)) {
+      instance.exec(`ALTER TABLE memories ADD COLUMN ${ddl}`);
+    }
+  };
+  add("meta_type", "meta_type TEXT");
+  add("pinned", "pinned INTEGER NOT NULL DEFAULT 0");
+  add("branch", "branch TEXT");
+  add("meta_json", "meta_json TEXT");
+}
+
 export function getDb(): Database.Database {
   if (db) return db;
 
@@ -57,6 +76,9 @@ export function getDb(): Database.Database {
       tokenize = 'porter unicode61'
     );
   `);
+
+  // Additive 0.3 columns — safe on existing DBs; unused columns are NULL/0.
+  migrateColumns(instance);
 
   const defaultSpace = instance
     .prepare(`SELECT id FROM spaces WHERE name = ?`)

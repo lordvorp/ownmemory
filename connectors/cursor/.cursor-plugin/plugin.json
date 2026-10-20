@@ -1,6 +1,6 @@
 {
   "name": "ownmemory",
-  "version": "0.2.1",
+  "version": "0.3.1",
   "description": "Local-first persistent memory for Cursor agents. SQLite + on-device embeddings via OwnMemory MCP — no cloud account.",
   "author": {
     "name": "Rob Bloodgood",
