@@ -15,7 +15,9 @@
     "mcp": "node bin/ownmemory-mcp.mjs",
     "smoke": "tsx scripts/smoke.ts",
     "reembed": "tsx scripts/reembed.ts",
-    "cursor:install": "bash connectors/cursor/scripts/install-local.sh"
+    "cursor:install": "bash connectors/cursor/scripts/install-local.sh",
+    "embed-http": "tsx connectors/zikron-embed/src/run.ts",
+    "test:embed-http": "node --import tsx --test connectors/zikron-embed/src/server.test.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
