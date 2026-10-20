@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { createEmbedServer } from "./server.ts";
+import { createEmbedServer } from "./server";
 
 function listen(server: import("node:http").Server): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -62,6 +62,27 @@ describe("createEmbedServer", () => {
       assert.equal(body.embedding.length, 384);
       assert.equal(body.embedding[0], 4);
       assert.deepEqual(roles, ["query"]);
+    } finally {
+      server.close();
+    }
+  });
+
+  it("rejects malformed JSON with 400", async () => {
+    const server = createEmbedServer({
+      embed: async () => new Float32Array(384),
+      health: { model: "x", dims: 384, pooling: "cls" },
+      isReady: () => true,
+    });
+    const base = await listen(server);
+    try {
+      const res = await fetch(`${base}/v1/embed`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: "{not json",
+      });
+      assert.equal(res.status, 400);
+      const body = await res.json();
+      assert.equal(body.error, "invalid JSON");
     } finally {
       server.close();
     }

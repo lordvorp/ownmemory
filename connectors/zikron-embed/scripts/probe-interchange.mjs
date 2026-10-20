@@ -15,12 +15,25 @@ const PROBE = "Zikron embedder check";
 const SIDECAR = (process.env.SIDECAR_URL || "http://127.0.0.1:8791").replace(/\/$/, "");
 const CYPHER = (process.env.CYPHER_URL || "").replace(/\/$/, "");
 const PREFIX = "Represent this sentence for searching relevant passages: ";
+const EXPECTED_DIMS = 384;
+
+function assertVectorDims(vec, label) {
+  if (!Array.isArray(vec) || vec.length !== EXPECTED_DIMS) {
+    const got = Array.isArray(vec) ? vec.length : typeof vec;
+    throw new Error(`${label}: expected length ${EXPECTED_DIMS}, got ${got}`);
+  }
+}
 
 function cosine(a, b) {
+  assertVectorDims(a, "cosine(a)");
+  assertVectorDims(b, "cosine(b)");
+  if (a.length !== b.length) {
+    throw new Error(`cosine: length mismatch ${a.length} vs ${b.length}`);
+  }
   let dot = 0,
     na = 0,
     nb = 0;
-  const n = Math.min(a.length, b.length);
+  const n = a.length;
   for (let i = 0; i < n; i++) {
     dot += a[i] * b[i];
     na += a[i] * a[i];
@@ -57,7 +70,7 @@ async function cypherEmbed(text, role) {
 
 async function localEmbed(text, role) {
   const code = `
-    import { embedText } from "./src/lib/memory/embed.ts";
+    import { embedText } from "./src/lib/memory/embed";
     void (async () => {
       const v = await embedText(${JSON.stringify(text)}, ${JSON.stringify(role)});
       process.stdout.write(JSON.stringify(Array.from(v)));

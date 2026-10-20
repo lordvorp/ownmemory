@@ -33,15 +33,33 @@ final class Zikron_Embed
         $gpuBase = getenv('ZIKRON_EMBED_GPU_URL') ?: '';
         if ($gpuBase === '') {
             self::$useGpu = false;
+            error_log('Zikron_Embed: locked to sidecar (ZIKRON_EMBED_GPU_URL unset)');
             return;
         }
         $side = self::callSidecar(self::PROBE, 'document');
         $gpu = self::callCypher(self::PROBE, 'document');
         if ($side === null || $gpu === null) {
             self::$useGpu = false;
+            error_log(
+                'Zikron_Embed: locked to sidecar (probe failed: side='
+                . ($side === null ? 'null' : 'ok')
+                . ' gpu='
+                . ($gpu === null ? 'null' : 'ok')
+                . ')'
+            );
             return;
         }
-        self::$useGpu = self::cosine($side, $gpu) >= 0.98;
+        $sim = self::cosine($side, $gpu);
+        self::$useGpu = $sim >= 0.98;
+        if (self::$useGpu) {
+            error_log('Zikron_Embed: locked to gpu (cosine=' . round($sim, 4) . ')');
+        } else {
+            error_log(
+                'Zikron_Embed: locked to sidecar (gpu gate failed: cosine='
+                . round($sim, 4)
+                . ' < 0.98)'
+            );
+        }
     }
 
     private static function embed(string $text, string $role): ?array

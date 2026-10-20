@@ -71,6 +71,10 @@ export function createEmbedServer(opts: {
       }
       send(res, 404, { error: "not found" });
     } catch (err) {
+      if (err instanceof SyntaxError) {
+        send(res, 400, { error: "invalid JSON" });
+        return;
+      }
       const msg = err instanceof Error ? err.message : String(err);
       send(res, 500, { error: msg });
     }

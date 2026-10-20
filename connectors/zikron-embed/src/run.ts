@@ -9,8 +9,8 @@ import {
   getActiveEmbedderProfile,
   isEmbeddingReady,
   warmEmbeddings,
-} from "../../../src/lib/memory/embed.ts";
-import { createEmbedServer } from "./server.ts";
+} from "../../../src/lib/memory/embed";
+import { createEmbedServer } from "./server";
 
 const listen = process.env.EMBED_LISTEN?.trim() || "0.0.0.0:8791";
 const [host, portStr] = listen.includes(":")
