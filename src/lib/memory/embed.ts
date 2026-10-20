@@ -19,6 +19,12 @@
 import { env, pipeline } from "@xenova/transformers";
 import { EMBEDDING_MODEL, getCacheDir } from "./paths";
 
+/** Arctic-embed query prefix — documents must not use this. */
+export const QUERY_PREFIX =
+  "Represent this sentence for searching relevant passages: ";
+
+export type EmbedRole = "query" | "document";
+
 type FeatureExtractor = (
   text: string,
   options?: {
@@ -42,6 +48,7 @@ async function getExtractor(): Promise<FeatureExtractor> {
   if (!extractorPromise) {
     configureEnv();
     extractorPromise = (async () => {
+      // Default quantized ONNX (~67MB) for snowflake-arctic-embed-s.
       const pipe = (await pipeline(
         "feature-extraction",
         EMBEDDING_MODEL,
@@ -78,9 +85,17 @@ export function warmEmbeddings(): void {
   });
 }
 
-export async function embedText(text: string): Promise<Float32Array> {
+/**
+ * Embed text with CLS pooling + L2 normalize.
+ * Use role "query" for search/forget matching; "document" when storing memories.
+ */
+export async function embedText(
+  text: string,
+  role: EmbedRole = "document",
+): Promise<Float32Array> {
+  const input = role === "query" ? `${QUERY_PREFIX}${text}` : text;
   const extractor = await getExtractor();
-  const output = await extractor(text, { pooling: "mean", normalize: true });
+  const output = await extractor(input, { pooling: "cls", normalize: true });
   return new Float32Array(output.data);
 }
 

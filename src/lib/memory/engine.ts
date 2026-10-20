@@ -23,6 +23,7 @@ import {
   warmEmbeddings,
 } from "./embed";
 import { getDataDir, getDbPath, PRODUCT_NAME } from "./paths";
+import { OWNMEMORY_VERSION } from "./version";
 import { buildProfile, formatContextPrompt } from "./profile";
 import { hybridSearch } from "./search";
 import {
@@ -101,6 +102,7 @@ export function whoAmI(): WhoAmI {
   ensureEngine();
   return {
     product: PRODUCT_NAME,
+    version: OWNMEMORY_VERSION,
     mode: "local",
     dataDir: getDataDir(),
     dbPath: getDbPath(),

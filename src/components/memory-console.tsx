@@ -39,6 +39,7 @@ type Space = { id: string; name: string; createdAt: string };
 
 type Health = {
   product: string;
+  version?: string;
   mode: string;
   dataDir: string;
   dbPath: string;
@@ -49,7 +50,7 @@ type Health = {
   mcp?: {
     command: string;
     args: string[];
-    env: Record<string, string>;
+    env?: Record<string, string>;
   };
 };
 
@@ -209,6 +210,9 @@ export function MemoryConsole() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Badge variant="secondary" className="rounded-md px-3 py-1">
+            {health?.version ? `v${health.version}` : "local"}
+          </Badge>
           <Badge variant="secondary" className="rounded-md px-3 py-1">
             {health?.mode ?? "local"}
           </Badge>

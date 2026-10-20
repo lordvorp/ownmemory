@@ -47,6 +47,7 @@ export type Profile = {
 
 export type WhoAmI = {
   product: string;
+  version: string;
   mode: "local";
   dataDir: string;
   dbPath: string;

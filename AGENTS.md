@@ -6,7 +6,20 @@ This repo is a **local** memory engine. Do not call Supermemory or any cloud mem
 - Remove outdated facts with `memory` (`action: "forget"`).
 - Search with `recall` before inventing user preferences.
 - Scope project-specific facts with `containerTag` / spaces.
-- Data lives under `OWNMEMORY_DATA_DIR` (default `~/.ownmemory`).
+- Data lives under `OWNMEMORY_DATA_DIR` (default `~/.ownmemory`, `~` expanded).
+- Default embedder is `Snowflake/snowflake-arctic-embed-s` unless `OWNMEMORY_EMBEDDING_MODEL` is set.
+
+## Versioning
+
+Track releases in `package.json` + `CHANGELOG.md` on version bumps:
+
+| Tier | SemVer | When |
+| --- | --- | --- |
+| **major** | `X.0.0` | Breaking store, API, or MCP contract |
+| **semi-major** | `0.X.0` / `X.Y.0` | Significant capability (new default embedder, new tool surface) |
+| **minor** | `X.Y.Z` | Fixes and small compatible improvements |
+
+Bump the matching tier in the same commit that lands the change. Do not leave version bumps for a later housekeeping PR.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

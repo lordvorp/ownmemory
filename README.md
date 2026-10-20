@@ -9,7 +9,7 @@ This is a replacement component, not a client shell around someone else’s serv
 | Capability | How OwnMemory does it |
 | --- | --- |
 | Save / forget memories | `memory` MCP tool + HTTP API |
-| Semantic + keyword recall | Hybrid FTS5 + MiniLM embeddings |
+| Semantic + keyword recall | Hybrid FTS5 + snowflake-arctic-embed-s |
 | Spaces / projects | `containerTag` → local spaces |
 | Profile / context injection | Preference heuristics + recent activity |
 | Inspect account | `whoAmI` → local paths, model, counts |
@@ -61,14 +61,13 @@ Manual shape:
     "ownmemory": {
       "type": "stdio",
       "command": "node",
-      "args": ["/ABS/PATH/TO/this-repo/bin/ownmemory-mcp.mjs"],
-      "env": {
-        "OWNMEMORY_DATA_DIR": "${userHome}/.ownmemory"
-      }
+      "args": ["/ABS/PATH/TO/this-repo/bin/ownmemory-mcp.mjs"]
     }
   }
 }
 ```
+
+Env overrides are optional — unset values use `~/.ownmemory` and `Snowflake/snowflake-arctic-embed-s`.
 
 Run the server by hand (stdio; used by Cursor, not for browsers):
 
@@ -107,12 +106,12 @@ Prompt: `context` — system-context injection text
 
 | Variable | Meaning |
 | --- | --- |
-| `OWNMEMORY_DATA_DIR` | Data root (default `~/.ownmemory`) |
-| `OWNMEMORY_DB_PATH` | Override DB file path |
-| `OWNMEMORY_EMBEDDING_MODEL` | Default `Xenova/all-MiniLM-L6-v2` |
+| `OWNMEMORY_DATA_DIR` | Data root (default `~/.ownmemory`; leading `~` is expanded) |
+| `OWNMEMORY_DB_PATH` | Override DB file path (`~` expanded) |
+| `OWNMEMORY_EMBEDDING_MODEL` | Default `Snowflake/snowflake-arctic-embed-s` |
 | `OWNMEMORY_OFFLINE=1` | Disallow remote model download |
 
-First embedding run downloads the MiniLM weights (~23MB) into `models/`. After that, recall works offline. If embeddings fail, **keyword (FTS5) search still works**.
+First embedding run downloads arctic-embed-s (quantized ONNX, ~67MB) into `models/`. After that, recall works offline. If embeddings fail, **keyword (FTS5) search still works**. After changing the embedder, run `npm run reembed`.
 
 ## Architecture
 

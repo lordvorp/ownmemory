@@ -32,15 +32,9 @@ const server = path.join(root, "src", "mcp", "server.ts");
 
 const child = spawn(process.execPath, [tsxCli, server], {
   stdio: "inherit",
-  env: {
-    ...process.env,
-    OWNMEMORY_DATA_DIR:
-      process.env.OWNMEMORY_DATA_DIR ||
-      path.join(
-        process.env.HOME || process.env.USERPROFILE || root,
-        ".ownmemory",
-      ),
-  },
+  // Leave OWNMEMORY_* unset so src/lib/memory/paths.ts applies defaults
+  // (~/.ownmemory + Snowflake/snowflake-arctic-embed-s) unless the user set them.
+  env: { ...process.env },
   cwd: root,
 });
 

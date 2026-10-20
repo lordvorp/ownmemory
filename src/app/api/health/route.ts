@@ -38,9 +38,6 @@ export async function GET() {
       type: "stdio",
       command: "node",
       args: [mcpEntry],
-      env: {
-        OWNMEMORY_DATA_DIR: info.dataDir,
-      },
     },
   });
 }

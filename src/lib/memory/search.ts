@@ -93,7 +93,7 @@ async function semanticSearch(
   spaceId: string | undefined,
   limit: number,
 ): Promise<ScoredMemory[]> {
-  const queryVec = await embedText(query);
+  const queryVec = await embedText(query, "query");
   const candidates = listMemoriesWithEmbeddings(spaceId);
 
   const scored: ScoredMemory[] = [];

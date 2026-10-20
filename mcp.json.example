@@ -3,10 +3,7 @@
     "ownmemory": {
       "type": "stdio",
       "command": "node",
-      "args": ["/ABS/PATH/TO/this-repo/bin/ownmemory-mcp.mjs"],
-      "env": {
-        "OWNMEMORY_DATA_DIR": "${userHome}/.ownmemory"
-      }
+      "args": ["/ABS/PATH/TO/this-repo/bin/ownmemory-mcp.mjs"]
     }
   }
 }

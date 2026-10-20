@@ -108,7 +108,7 @@ export async function saveMemory(
 
   let embedding: Buffer | null = null;
   try {
-    embedding = float32ToBuffer(await embedText(text));
+    embedding = float32ToBuffer(await embedText(text, "document"));
   } catch {
     // Keyword search still works without embeddings.
   }
@@ -163,7 +163,7 @@ export async function forgetMemory(
 
   if (toRemove.length === 0) {
     try {
-      const queryVec = await embedText(text);
+      const queryVec = await embedText(text, "query");
       const scored = candidates
         .map((m) => {
           const row = getMemoryRow(m.id);
