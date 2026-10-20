@@ -2,6 +2,14 @@
 
 Versions live in `package.json`. Bump on **major**, **semi-major**, and **minor** release commits (see [AGENTS.md](AGENTS.md)).
 
+## 0.4.0 — 2026-10-20
+
+### Semi-major
+
+- New connector `connectors/zikron-embed`: HTTP sidecar reusing OwnMemory arctic-s embeddings for Zikron/WordPress (`GET /health`, `POST /v1/embed`).
+- Docker + compose fragment for janet; PHP reference client with optional cypher GPU (`snowflake-arctic-embed:33m`) gated by cosine interchangeability.
+- `npm run embed-http` / `npm run test:embed-http`.
+
 ## 0.3.1 — 2026-10-20
 
 ### Minor

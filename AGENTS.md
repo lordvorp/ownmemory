@@ -20,6 +20,7 @@ Assume the machine may have **none** of our hosts yet. Treat connectors as **opt
 | Cursor | `connectors/cursor` | Cursor is the agent host (default for this repo) |
 | OpenClaw | `connectors/openclaw` | OpenClaw is present or user asks |
 | Open WebUI | `connectors/openwebui` | Open WebUI is present or user asks |
+| Zikron embed HTTP | `connectors/zikron-embed` | WordPress/Zikron on janet needs on-box arctic-s |
 
 On first contact with a blank system: run `/ownmemory:onboard` (or `connectors/cursor/scripts/install-local.sh`), `npm install` at repo root, verify `whoAmI`, then only enable extra connectors that match the host. Prefs may still live under `~/.cursor` / `~/.ownmemory`; canonical OwnMemory-owned Cursor slices remain in this repo and are symlinked out.
 
