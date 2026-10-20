@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "ownmemory": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["/home/rob/work/ownmemory/bin/ownmemory-mcp.mjs"]
+    }
+  }
+}

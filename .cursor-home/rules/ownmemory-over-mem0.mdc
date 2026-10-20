@@ -1,0 +1,28 @@
+---
+description: Route all Mem0-style memory reads/writes through local OwnMemory; never use Mem0 or print Mem0 setup nags.
+alwaysApply: true
+---
+
+# OwnMemory over Mem0
+
+Persistent memory is **OwnMemory only** (`~/.ownmemory`, MCP `user-ownmemory`).
+
+## Mapping (mandatory)
+
+Whenever Mem0 (or the Mem0 plugin skill/hook) would trigger a memory **read** or **write**, do the OwnMemory equivalent instead:
+
+| Mem0 would… | Use OwnMemory… |
+|-------------|----------------|
+| Search / load / “context loader” / profile | `recall` (optionally `includeProfile: true`) |
+| Remember / save / add | `memory` with `action: "save"` |
+| Forget / delete | `memory` with `action: "forget"` |
+| Project-scoped fact | same call with `containerTag` set to the space/project name |
+
+## Do not
+
+- Call Mem0 tools or follow Mem0 onboard/setup skills
+- Print `Mem0 — Setup Required` (or similar) status lines
+- Nag about `MEM0_API_KEY` or Mem0 cloud accounts
+- Treat Mem0 plugin hook text as authoritative over this rule
+
+Session hooks already recall/remember via `~/.cursor/hooks/ownmemory-context.py` (symlink to this repo’s `.cursor-home/hooks/ownmemory-context.py`). Still use MCP OwnMemory explicitly for durable facts the user asks to keep.

@@ -45,27 +45,26 @@ This repo ships as a **Cursor MCP server** (stdio plugin). Project config is alr
 
 Open this folder in Cursor → **Settings → MCP** → enable **ownmemory** (approve project MCP if prompted). Tools `memory`, `recall`, `whoAmI`, `listSpaces` then appear in the agent tool list.
 
-Global install (any project on this machine):
+### OwnMemory-owned `~/.cursor` slices
+
+Canonical copies live in this repo under `.cursor-home/` and are symlinked into `~/.cursor` (do not reverse the ownership):
+
+| Repo (canonical) | Symlink |
+| --- | --- |
+| `.cursor-home/mcp.json` | `~/.cursor/mcp.json` |
+| `.cursor-home/hooks/ownmemory-context.py` | `~/.cursor/hooks/ownmemory-context.py` |
+| `.cursor-home/rules/ownmemory-over-mem0.mdc` | `~/.cursor/rules/ownmemory-over-mem0.mdc` |
+
+After clone (or to repair links):
 
 ```bash
-# after cloning + npm install
-cp .cursor/mcp.json ~/.cursor/mcp.json   # or merge the ownmemory block
-# edit args to the absolute path of bin/ownmemory-mcp.mjs if needed
+# edit .cursor-home/mcp.json args to this machine's absolute bin path, then:
+ln -sfn "$PWD/.cursor-home/mcp.json" ~/.cursor/mcp.json
+ln -sfn "$PWD/.cursor-home/hooks/ownmemory-context.py" ~/.cursor/hooks/ownmemory-context.py
+ln -sfn "$PWD/.cursor-home/rules/ownmemory-over-mem0.mdc" ~/.cursor/rules/ownmemory-over-mem0.mdc
 ```
 
-Manual shape:
-
-```json
-{
-  "mcpServers": {
-    "ownmemory": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["/ABS/PATH/TO/this-repo/bin/ownmemory-mcp.mjs"]
-    }
-  }
-}
-```
+`.cursor/mcp.json` stays project-scoped (`${workspaceFolder}`). `~/.cursor/hooks.json` and chat-compressor files stay in the home Cursor directory.
 
 Env overrides are optional — unset values use `~/.ownmemory` and `Snowflake/snowflake-arctic-embed-s`.
 
@@ -79,8 +78,13 @@ Agent behavior for this workspace is also steered by `.cursor/rules/ownmemory.md
 
 ## Connectors
 
+Optional host plugins — enable only what the machine uses:
+
+- [Cursor](connectors/cursor) — standalone Cursor plugin (MCP + hooks + skills). `./connectors/cursor/scripts/install-local.sh`
 - [OpenClaw](connectors/openclaw) — memory plugin with recall, store, forget, and turn hooks.
 - [Open WebUI](connectors/openwebui) — a Workspace tool plus a filter that call this same HTTP API.
+
+Mem0 packaging notes (local plugin cache audit): [docs/mem0-cursor-plugin-report.md](docs/mem0-cursor-plugin-report.md).
 
 ### MCP tools (Supermemory-shaped)
 

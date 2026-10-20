@@ -2,6 +2,15 @@
 
 Versions live in `package.json`. Bump on **major**, **semi-major**, and **minor** release commits (see [AGENTS.md](AGENTS.md)).
 
+## 0.2.1 — 2026-10-19
+
+### Minor
+
+- OwnMemory-owned Cursor home slices live under `.cursor-home/` and symlink into `~/.cursor` (`mcp.json`, hooks, Mem0-routing rule).
+- New Cursor plugin package at `connectors/cursor/` (manifest, stdio MCP wrapper, hooks, skills, `install-local.sh`) for GUI install/enable like marketplace plugins.
+- Agent notes cover cold systems and optional connectors (Cursor / OpenClaw / Open WebUI) as install-time plugins.
+- Added [`docs/mem0-cursor-plugin-report.md`](docs/mem0-cursor-plugin-report.md) from the local Mem0 plugin cache.
+
 ## 0.2.0 — 2026-10-19
 
 ### Semi-major

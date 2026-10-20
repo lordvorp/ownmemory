@@ -1,6 +1,6 @@
 {
   "name": "ownmemory",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "license": "GPL-2.0-only",
   "description": "Local-first persistent memory for AI agents — SQLite, on-device embeddings, Cursor MCP",
@@ -14,7 +14,8 @@
     "lint": "eslint",
     "mcp": "node bin/ownmemory-mcp.mjs",
     "smoke": "tsx scripts/smoke.ts",
-    "reembed": "tsx scripts/reembed.ts"
+    "reembed": "tsx scripts/reembed.ts",
+    "cursor:install": "bash connectors/cursor/scripts/install-local.sh"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

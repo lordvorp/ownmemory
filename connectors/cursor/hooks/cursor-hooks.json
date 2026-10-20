@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": "${CURSOR_PLUGIN_ROOT}/hooks/ownmemory-context.py recall",
+        "timeout": 8
+      }
+    ],
+    "stop": [
+      {
+        "command": "${CURSOR_PLUGIN_ROOT}/hooks/ownmemory-context.py remember",
+        "timeout": 8
+      }
+    ]
+  }
+}
