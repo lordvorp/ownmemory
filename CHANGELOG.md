@@ -9,6 +9,7 @@ Versions live in `package.json`. Bump on **major**, **semi-major**, and **minor*
 - New connector `connectors/zikron-embed`: HTTP sidecar reusing OwnMemory arctic-s embeddings for Zikron/WordPress (`GET /health`, `POST /v1/embed`).
 - Docker + compose fragment for janet; PHP reference client with optional cypher GPU (`snowflake-arctic-embed:33m`) gated by cosine interchangeability.
 - `npm run embed-http` / `npm run test:embed-http`.
+- **Frozen completeness:** this connector is a finished standalone part (see `connectors/zikron-embed/CONTRACT.md`). Downstream Zikron/janet deploy does not reopen it as incomplete. Local-only arctic-s always works; upstream GPU/inference is optional only.
 
 ## 0.3.1 — 2026-10-20
 

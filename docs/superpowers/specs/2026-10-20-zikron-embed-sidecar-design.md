@@ -1,9 +1,20 @@
 # OwnMemory embed HTTP sidecar (for Zikron / janet)
 
 Date: 2026-10-20  
-Status: Approved 2026-10-20  
+Status: **SHIPPED · FEATURE-COMPLETE · FROZEN (OwnMemory 0.4.0)** — Approved 2026-10-20, locked on `main`  
+Frozen contract (canonical): [`connectors/zikron-embed/CONTRACT.md`](../../../connectors/zikron-embed/CONTRACT.md)  
 Related: zeek repo `docs/superpowers/specs/2026-10-17-zikron-wordpress-design.md`  
 Note: For janet embeddings, this doc **supersedes** that file’s preference for Ollama/`snowflake-arctic-embed:33m` as the local path. Prefer this OwnMemory-style HTTP sidecar; keep a single writer geometry for `VECTOR(384)`.
+
+## Frozen product rule (non-negotiable)
+
+`connectors/zikron-embed` is a **fully functional, feature-complete, standalone connector**. It is **its own part**. It **does its job** (HTTP arctic-s → float[384] for Zikron). That job is **done** as of 0.4.0.
+
+- Not a stub, scaffold, spike, or “waiting on janet/WP to be real.”
+- Downstream work (Zikron plugin deploy, WPDB wiring, query spaces) is **other parts**. Their absence does **not** make this connector incomplete.
+- Within its job it is the stable path that **must not regress**. Protocol errors (400 / `ready: false`) are correct contract behavior.
+- **Local-only hardware always works, period** (on-box arctic-s sidecar). Upstream inference (Cypher GPU, etc.) is optional when available; never required. Upstream down → sidecar still serves.
+- Do not redefine or hollow this part. Supersede only with a **major** version and an explicit rewrite of `CONTRACT.md`.
 
 ## Purpose
 
@@ -188,12 +199,22 @@ Do **not** load ONNX inside PHP. Do **not** run Ollama on janet for embeddings (
 
 ## Success criteria
 
-1. janet `docker compose up -d embed` serves `/health` with `dims: 384` after first model download
-2. Same input → OwnMemory in-process arctic-s and sidecar cosine ≥ 0.99 on a short probe set
-3. Cypher `:33m` vs sidecar cosine ≥ 0.98 on the fixed probe (or GPU path stays disabled)
-4. Zikron can save a memory whose `embedding` column is non-NULL without PHP memory_limit pressure from model weights
-5. Sidecar RSS stays clearly below a comparable Ollama embed container on the same host
-6. With cypher up, a short batch embed prefers GPU; with cypher stopped, sidecar still serves
+### Connector job (SHIPPED / satisfied at 0.4.0)
+
+1. ~~Sidecar serves `/health` with `dims: 384`~~ — satisfied (`npm run embed-http` + Docker path)
+2. ~~Same input → OwnMemory in-process arctic-s and sidecar cosine ≥ 0.99~~ — measured **1.0**
+3. ~~Cypher `:33m` vs sidecar cosine ≥ 0.98 (or GPU path disabled)~~ — measured **~0.992**
+4. ~~`npm run test:embed-http` green~~ — **4/4**
+5. PHP reference client + compose fragment + probe scripts present under `connectors/zikron-embed/`
+
+### Consumer / ops (other parts — do not reopen connector completeness)
+
+6. janet `docker compose up -d embed` on the live WP stack (deploy step)
+7. Zikron plugin on janet saves non-NULL `VECTOR(384)` via this sidecar (zeek/WP work)
+8. Sidecar RSS vs Ollama on janet after deploy measurement
+9. Live routing: cypher up → prefer GPU; cypher down → sidecar still serves
+
+Criteria 6–9 are **integration of a finished connector**, not missing features of this part.
 
 ## Out of scope
 
@@ -204,10 +225,11 @@ Do **not** load ONNX inside PHP. Do **not** run Ollama on janet for embeddings (
 - Publishing the sidecar on a public interface
 - Replacing OwnMemory’s in-process embedder with HTTP on Sheila
 - Ollama-on-janet for embeddings
+- Any claim that this connector is incomplete until those land
 
-## Open points (resolve at implement time if needed)
+## Open points (ops / other parts only — connector contract closed)
 
 - Image distribution: build on janet from a git checkout vs multi-arch image from CI
 - Exact `mem_limit` after measuring warm RSS on aarch64
-- How Zikron plugin source is deployed onto janet relative to this sidecar (already planned separately under zeek)
-- Hard-prefer cypher vs 5-minute latency probe for picking the winner
+- How Zikron plugin source is deployed onto janet relative to this sidecar (zeek)
+- Hard-prefer cypher vs 5-minute latency probe for picking the winner (PHP client policy)

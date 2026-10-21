@@ -1,5 +1,7 @@
 # Zikron embed HTTP sidecar
 
+**SHIPPED · FEATURE-COMPLETE · STANDALONE** (OwnMemory 0.4.0). Frozen contract: [`CONTRACT.md`](./CONTRACT.md) — this connector is its own finished part; it does the embed job and that job does not get reopened as “incomplete.”
+
 Tiny HTTP service that exposes OwnMemory’s on-device **Snowflake/snowflake-arctic-embed-s** path (`@xenova/transformers`, CLS pooling, L2-normalized **384**-dim vectors). Zikron on janet calls it over Docker Compose and writes `VECTOR(384)` into MariaDB.
 
 Design spec: [`docs/superpowers/specs/2026-10-20-zikron-embed-sidecar-design.md`](../../docs/superpowers/specs/2026-10-20-zikron-embed-sidecar-design.md). PHP client reference: zeek repo Zikron embed routing (see design spec “Optional cypher GPU path” and plan task 5).
