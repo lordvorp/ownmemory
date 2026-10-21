@@ -1,7 +1,7 @@
 # Zikron embed sidecar — frozen contract (SHIPPED)
 
 **Status:** SHIPPED · FEATURE-COMPLETE · STANDALONE  
-**Locked:** 2026-10-20 (OwnMemory **0.4.0**, `main` @ `02cec78`)  
+**Locked:** 2026-10-20 (OwnMemory **0.4.0**); engine key on API since **0.4.1**  
 **Authority:** This file + [`docs/superpowers/specs/2026-10-20-zikron-embed-sidecar-design.md`](../../docs/superpowers/specs/2026-10-20-zikron-embed-sidecar-design.md)
 
 ---
@@ -44,11 +44,12 @@ Anything **outside** this table (WP plugin install on janet, MariaDB schema, fed
 
 1. **Standalone product slice** — optional OwnMemory connector; OwnMemory core stays SQLite-simple.
 2. **Dims = 384** arctic-s for Zikron `VECTOR(384)`. No silent model/dim swap.
-3. **No persistence here** — HTTP → vectors only. No spaces, recall, or WPDB inside this service.
-4. **No ONNX in PHP** — PHP is a client; Node holds the model.
-5. **Contract stability** — do not remove/rename `/health` or `/v1/embed`, or change response shape, without a **major** OwnMemory version and an explicit migration note.
-6. **Completeness stands** — do not reclassify this connector as WIP, experimental, or dependent on unshipped Zikron/janet steps for “done.”
-7. **Local always works** — baseline path is on-box arctic-s. Upstream GPU/cloud inference is optional only; never a hard dependency for embeds to succeed.
+3. **Engine key** — every health/embed response carries `engine` (catalog id, default `arctic-s`). **Embeddings and lookups must use the same engine.** Persist `engine` with the corpus (or settings); never query with a different engine than the vectors were written with. Optional Cypher GPU is acceleration for the same keyed engine after the interchange gate — not a second corpus.
+4. **No persistence here** — HTTP → vectors only. No spaces, recall, or WPDB inside this service.
+5. **No ONNX in PHP** — PHP is a client; Node holds the model.
+6. **Contract stability** — do not remove/rename `/health` or `/v1/embed`, or change response shape, without a **major** OwnMemory version and an explicit migration note.
+7. **Completeness stands** — do not reclassify this connector as WIP, experimental, or dependent on unshipped Zikron/janet steps for “done.”
+8. **Local always works** — baseline path is on-box arctic-s. Upstream GPU/cloud inference is optional only; never a hard dependency for embeds to succeed.
 
 ---
 

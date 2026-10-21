@@ -8,7 +8,13 @@ import http from "node:http";
 
 export type EmbedRole = "document" | "query";
 export type EmbedFn = (text: string, role: EmbedRole) => Promise<Float32Array>;
-export type HealthInfo = { model: string; dims: number; pooling: string };
+/** `engine` is the catalog id (e.g. arctic-s). Store + lookup must share it. */
+export type HealthInfo = {
+  engine: string;
+  model: string;
+  dims: number;
+  pooling: string;
+};
 
 function readJson(req: http.IncomingMessage): Promise<unknown> {
   return new Promise((resolve, reject) => {
@@ -47,6 +53,7 @@ export function createEmbedServer(opts: {
         send(res, 200, {
           ok: true,
           ready: opts.isReady(),
+          engine: opts.health.engine,
           model: opts.health.model,
           dims: opts.health.dims,
           pooling: opts.health.pooling,
@@ -64,6 +71,7 @@ export function createEmbedServer(opts: {
         const vec = await opts.embed(text, role);
         send(res, 200, {
           embedding: Array.from(vec),
+          engine: opts.health.engine,
           model: opts.health.model,
           dims: opts.health.dims,
         });

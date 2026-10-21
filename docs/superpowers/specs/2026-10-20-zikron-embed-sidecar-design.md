@@ -81,11 +81,14 @@ Internal only (Compose network). No published host port on janet by default.
 {
   "ok": true,
   "ready": true,
+  "engine": "arctic-s",
   "model": "Snowflake/snowflake-arctic-embed-s",
   "dims": 384,
   "pooling": "cls"
 }
 ```
+
+`engine` is the OwnMemory catalog id. **Embeddings and lookups must use the same engine** — key it on the VECTOR corpus / settings; never query with a different engine than was used to write.
 
 `ready: false` while the pipeline is still loading. Always HTTP **200** with the `ready` flag (not 503) so PHP can treat cold start as “keyword-only for now” instead of a hard outage.
 
@@ -109,6 +112,7 @@ Response:
 ```json
 {
   "embedding": [/* 384 floats */],
+  "engine": "arctic-s",
   "model": "Snowflake/snowflake-arctic-embed-s",
   "dims": 384
 }
@@ -120,7 +124,7 @@ Batch (optional v1.1, not required for first cut):
 { "texts": ["..."], "role": "document" }
 ```
 
-→ `{ "embeddings": [[...], ...], "model", "dims" }`
+→ `{ "embeddings": [[...], ...], "engine", "model", "dims" }`
 
 No auth in v1 (trusted Compose network). If the service is ever bound to a host port, add a shared secret header before that.
 

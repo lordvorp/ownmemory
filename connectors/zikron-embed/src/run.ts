@@ -26,6 +26,7 @@ const profile = getActiveEmbedderProfile();
 const server = createEmbedServer({
   embed: (text, role) => embedText(text, role),
   health: {
+    engine: profile.id,
     model: profile.hfModel,
     dims: profile.dims,
     pooling: profile.pooling,
@@ -37,6 +38,6 @@ warmEmbeddings();
 
 server.listen(port, host, () => {
   console.log(
-    `ownmemory-embed listening on http://${host}:${port} model=${profile.hfModel} dims=${profile.dims}`,
+    `ownmemory-embed listening on http://${host}:${port} engine=${profile.id} model=${profile.hfModel} dims=${profile.dims}`,
   );
 });

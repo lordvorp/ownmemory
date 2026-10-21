@@ -18,11 +18,14 @@ Returns HTTP 200 always; use `ready` for cold start:
 {
   "ok": true,
   "ready": true,
+  "engine": "arctic-s",
   "model": "Snowflake/snowflake-arctic-embed-s",
   "dims": 384,
   "pooling": "cls"
 }
 ```
+
+`engine` is the OwnMemory catalog id. **Store and lookup must use the same engine** (key it with the VECTOR corpus / settings).
 
 ### `POST /v1/embed`
 
@@ -41,6 +44,7 @@ Response:
 ```json
 {
   "embedding": [/* 384 floats */],
+  "engine": "arctic-s",
   "model": "Snowflake/snowflake-arctic-embed-s",
   "dims": 384
 }

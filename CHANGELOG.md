@@ -2,6 +2,12 @@
 
 Versions live in `package.json`. Bump on **major**, **semi-major**, and **minor** release commits (see [AGENTS.md](AGENTS.md)).
 
+## 0.4.1 — 2026-10-21
+
+### Minor
+
+- zikron-embed: health and `/v1/embed` responses include stable `engine` catalog id (`arctic-s`). Embeddings and lookups must share that key (CONTRACT invariant).
+
 ## 0.4.0 — 2026-10-20
 
 ### Semi-major

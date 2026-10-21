@@ -11,6 +11,8 @@ final class Zikron_Embed
     private const PREFIX = 'Represent this sentence for searching relevant passages: ';
     private const PROBE = 'Zikron embedder check';
     private const DIMS = 384;
+    /** Corpus key — store + lookup must share this (OwnMemory catalog id). */
+    public const ENGINE = 'arctic-s';
 
     /** @var bool|null null = not probed yet */
     private static ?bool $useGpu = null;
@@ -23,6 +25,21 @@ final class Zikron_Embed
     public static function query(string $text): ?array
     {
         return self::embed($text, 'query');
+    }
+
+    /** Embedding engine key for VECTOR space (always arctic-s for this client). */
+    public static function engine(): string
+    {
+        return self::ENGINE;
+    }
+
+    /** Locked backend after probe: sidecar | gpu | null if not probed. */
+    public static function backend(): ?string
+    {
+        if (self::$useGpu === null) {
+            return null;
+        }
+        return self::$useGpu ? 'gpu' : 'sidecar';
     }
 
     public static function probeAndLock(): void

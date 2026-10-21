@@ -20,7 +20,12 @@ describe("createEmbedServer", () => {
     let ready = false;
     const server = createEmbedServer({
       embed: async () => new Float32Array(384),
-      health: { model: "Snowflake/snowflake-arctic-embed-s", dims: 384, pooling: "cls" },
+      health: {
+        engine: "arctic-s",
+        model: "Snowflake/snowflake-arctic-embed-s",
+        dims: 384,
+        pooling: "cls",
+      },
       isReady: () => ready,
     });
     const base = await listen(server);
@@ -28,6 +33,7 @@ describe("createEmbedServer", () => {
       const cold = await fetch(`${base}/health`).then((r) => r.json());
       assert.equal(cold.ok, true);
       assert.equal(cold.ready, false);
+      assert.equal(cold.engine, "arctic-s");
       assert.equal(cold.dims, 384);
       ready = true;
       const hot = await fetch(`${base}/health`).then((r) => r.json());
@@ -46,7 +52,12 @@ describe("createEmbedServer", () => {
         v[0] = text.length;
         return v;
       },
-      health: { model: "Snowflake/snowflake-arctic-embed-s", dims: 384, pooling: "cls" },
+      health: {
+        engine: "arctic-s",
+        model: "Snowflake/snowflake-arctic-embed-s",
+        dims: 384,
+        pooling: "cls",
+      },
       isReady: () => true,
     });
     const base = await listen(server);
@@ -58,6 +69,7 @@ describe("createEmbedServer", () => {
       });
       assert.equal(res.status, 200);
       const body = await res.json();
+      assert.equal(body.engine, "arctic-s");
       assert.equal(body.dims, 384);
       assert.equal(body.embedding.length, 384);
       assert.equal(body.embedding[0], 4);
@@ -70,7 +82,7 @@ describe("createEmbedServer", () => {
   it("rejects malformed JSON with 400", async () => {
     const server = createEmbedServer({
       embed: async () => new Float32Array(384),
-      health: { model: "x", dims: 384, pooling: "cls" },
+      health: { engine: "arctic-s", model: "x", dims: 384, pooling: "cls" },
       isReady: () => true,
     });
     const base = await listen(server);
@@ -91,7 +103,7 @@ describe("createEmbedServer", () => {
   it("rejects empty text with 400", async () => {
     const server = createEmbedServer({
       embed: async () => new Float32Array(384),
-      health: { model: "x", dims: 384, pooling: "cls" },
+      health: { engine: "arctic-s", model: "x", dims: 384, pooling: "cls" },
       isReady: () => true,
     });
     const base = await listen(server);
