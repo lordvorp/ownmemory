@@ -13,7 +13,7 @@ Note: For janet embeddings, this doc **supersedes** that file’s preference for
 - Not a stub, scaffold, spike, or “waiting on janet/WP to be real.”
 - Downstream work (Zikron plugin deploy, WPDB wiring, query spaces) is **other parts**. Their absence does **not** make this connector incomplete.
 - Within its job it is the stable path that **must not regress**. Protocol errors (400 / `ready: false`) are correct contract behavior.
-- **Local-only hardware always works, period** (on-box arctic-s sidecar). Upstream inference (Cypher GPU, etc.) is optional when available; never required. Upstream down → sidecar still serves.
+- **Same engine slot, optional faster backend:** Cypher/cloud for the keyed engine is just faster for the same slot — not a second corpus. No Cypher → slotted engine (arctic-s today; MiniLM/substitute only if that is the key) runs on CPU and Just Works. Upstream down → local CPU still serves.
 - Do not redefine or hollow this part. Supersede only with a **major** version and an explicit rewrite of `CONTRACT.md`.
 
 ## Purpose

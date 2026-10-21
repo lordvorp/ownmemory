@@ -15,12 +15,22 @@ Future work (Zikron WP wiring on janet, query spaces, import/export, GPU routing
 
 **“Never fails” / always works (design rule):** Within its job, this component is the stable embed path for Zikron’s 384-d geometry. Agents and humans must treat regressions of this contract as **release blockers**, not optional polish. Expected client/protocol errors (empty text → 400, invalid JSON → 400, cold start `ready: false`) are **correct contract behavior**, not incompleteness.
 
+### Engine slot vs backend (same key)
+
+| Concept | What it is |
+|---------|------------|
+| **Engine (`engine` key)** | Catalog slot for the VECTOR space — store + lookup must match. Current Zikron slot: **`arctic-s`** (MiniLM / other catalog ids are substitutes only if you re-key and re-embed the whole corpus). |
+| **Backend** | Where that same engine runs: local CPU sidecar, or optional Cypher / cloud accel for the **same slot**. |
+
+**Rule:** Cypher / cloud for the slotted engine is **just faster for the same engine** — an upgraded path in the same slot, not a different corpus.  
+**If no Cypher (or cloud):** the slotted engine (arctic-s today; MiniLM or another substitute only when that is the keyed engine) **runs on CPU and Just Works.** Full stop.
+
 ### Local-only hardware — ALWAYS WORKS
 
 This connector **works on local-only hardware, period.**  
-CPU + arctic-s ONNX on the box (sidecar / OwnMemory path) is the **baseline that always works**. No GPU, no Cypher, no cloud, no upstream inference required.
+CPU + on-box ONNX for the keyed engine (sidecar / OwnMemory path) is the **baseline that always works**. No GPU, no Cypher, no cloud required.
 
-Upstream inference (e.g. Cypher Ollama `:33m` GPU) is an **optional acceleration** when available and interchange-gated. It must never be required for correctness. If upstream is down, slow, or absent: **sidecar still serves. Full stop.**
+Upstream (Cypher Ollama, cloud, etc.) is optional acceleration for that same `engine` key, interchange-gated when the weights differ. It must never be required for correctness. If upstream is down, slow, or absent: **local CPU still serves. Full stop.**
 
 ---
 
@@ -44,12 +54,12 @@ Anything **outside** this table (WP plugin install on janet, MariaDB schema, fed
 
 1. **Standalone product slice** — optional OwnMemory connector; OwnMemory core stays SQLite-simple.
 2. **Dims = 384** arctic-s for Zikron `VECTOR(384)`. No silent model/dim swap.
-3. **Engine key** — every health/embed response carries `engine` (catalog id, default `arctic-s`). **Embeddings and lookups must use the same engine.** Persist `engine` with the corpus (or settings); never query with a different engine than the vectors were written with. Optional Cypher GPU is acceleration for the same keyed engine after the interchange gate — not a second corpus.
+3. **Engine key** — every health/embed response carries `engine` (catalog id, default `arctic-s`). **Embeddings and lookups must use the same engine.** Persist `engine` with the corpus (or settings); never query with a different engine than the vectors were written with. Cypher/cloud is a **faster backend for the same slot**, not a second engine; CPU local for that slot always works without them.
 4. **No persistence here** — HTTP → vectors only. No spaces, recall, or WPDB inside this service.
 5. **No ONNX in PHP** — PHP is a client; Node holds the model.
 6. **Contract stability** — do not remove/rename `/health` or `/v1/embed`, or change response shape, without a **major** OwnMemory version and an explicit migration note.
 7. **Completeness stands** — do not reclassify this connector as WIP, experimental, or dependent on unshipped Zikron/janet steps for “done.”
-8. **Local always works** — baseline path is on-box arctic-s. Upstream GPU/cloud inference is optional only; never a hard dependency for embeds to succeed.
+8. **Local always works** — keyed engine on CPU (sidecar) Just Works with no Cypher/cloud. Upstream is optional speed only.
 
 ---
 
