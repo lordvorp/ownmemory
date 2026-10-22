@@ -1,7 +1,7 @@
 /*
  * OwnMemory — local-first persistent memory for AI agents.
  * Copyright (C) 2026 Rob Bloodgood
- * SPDX-License-Identifier: GPL-2.0-only
+ * SPDX-License-Identifier: MIT
  */
 
 /** Catalog of on-device embedding models (transformers.js / ONNX). */

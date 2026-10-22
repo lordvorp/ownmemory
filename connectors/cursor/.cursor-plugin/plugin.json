@@ -1,6 +1,6 @@
 {
   "name": "ownmemory",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Local-first persistent memory for Cursor agents. SQLite + on-device embeddings via OwnMemory MCP — no cloud account.",
   "author": {
     "name": "Rob Bloodgood",
@@ -9,7 +9,7 @@
   "homepage": "https://github.com/lordvorp/ownmemory",
   "repository": "https://github.com/lordvorp/ownmemory",
   "logo": "logo.svg",
-  "license": "GPL-2.0-only",
+  "license": "MIT",
   "keywords": ["ownmemory", "memory", "mcp", "local-first", "sqlite", "embeddings"],
   "skills": "./skills/",
   "hooks": "./hooks/cursor-hooks.json",

@@ -2,26 +2,16 @@
 title: OwnMemory Recall
 author: Rob Bloodgood
 version: 0.1.0
-license: GPL-2.0-only
+license: MIT
 description: Recall relevant OwnMemory notes before a turn and store the user message when the turn ends.
 requirements:
 """
 
 # OwnMemory — local-first persistent memory for AI agents.
 # Copyright (C) 2026 Rob Bloodgood
-# SPDX-License-Identifier: GPL-2.0-only
+# SPDX-License-Identifier: MIT
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; version 2.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <https://www.gnu.org/licenses/>.
+# Licensed under the MIT License. See the LICENSE file.
 
 import json
 import urllib.error

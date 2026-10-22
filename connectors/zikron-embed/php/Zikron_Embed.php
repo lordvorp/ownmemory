@@ -1,7 +1,7 @@
 <?php
 /**
  * Reference Zikron embed client — OwnMemory sidecar + optional cypher GPU.
- * GPL-2.0-only. Copy into the Zikron plugin and replace file_get_contents
+ * Licensed under the MIT License. Copy into the Zikron plugin and replace file_get_contents
  * with wp_remote_post when inside WordPress.
  */
 declare(strict_types=1);

@@ -2,6 +2,12 @@
 
 Versions live in `package.json`. Bump on **major**, **semi-major**, and **minor** release commits (see [AGENTS.md](AGENTS.md)).
 
+## 0.4.2 — 2026-10-22
+
+### Minor
+
+- Relicense OwnMemory from GPL-2.0-only to the MIT License.
+
 ## 0.4.1 — 2026-10-21
 
 ### Minor

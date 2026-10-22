@@ -1,6 +1,6 @@
 # Open WebUI connector
 
-Copyright (C) 2026 Rob Bloodgood. Licensed under the GNU General Public License, version 2 only. See the repository [LICENSE](../../LICENSE).
+Copyright (C) 2026 Rob Bloodgood. Licensed under the MIT License. See the repository [LICENSE](../../LICENSE).
 
 Two Open WebUI functions talk to a running OwnMemory server over HTTP. They do not open the SQLite file.
 

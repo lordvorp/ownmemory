@@ -1,6 +1,6 @@
 # OpenClaw connector
 
-Copyright (C) 2026 Rob Bloodgood. Licensed under the GNU General Public License, version 2 only. See the repository [LICENSE](../../LICENSE).
+Copyright (C) 2026 Rob Bloodgood. Licensed under the MIT License. See the repository [LICENSE](../../LICENSE).
 
 Memory plugin for OpenClaw. It calls a running OwnMemory server at `http://127.0.0.1:47321` (override with `baseUrl` or `OWNMEMORY_BASE_URL`).
 

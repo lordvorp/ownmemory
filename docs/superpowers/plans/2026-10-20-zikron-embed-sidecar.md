@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- License: GPL-2.0-only (same as OwnMemory / Zikron).
+- License: MIT.
 - Default model: `Snowflake/snowflake-arctic-embed-s` (384-d, quantized ONNX, CLS, query prefix only for `role=query`).
 - Sidecar API: `GET /health` always HTTP 200 with `ready` boolean; `POST /v1/embed` with `{ text, role }`.
 - No host port published on janet by default; php reaches `http://embed:8791`.
@@ -165,7 +165,7 @@ Create `connectors/zikron-embed/src/server.ts`:
 /*
  * OwnMemory — local-first persistent memory for AI agents.
  * Copyright (C) 2026 Rob Bloodgood
- * SPDX-License-Identifier: GPL-2.0-only
+ * SPDX-License-Identifier: MIT
  */
 
 import http from "node:http";
@@ -283,7 +283,7 @@ EOF
 /*
  * OwnMemory — local-first persistent memory for AI agents.
  * Copyright (C) 2026 Rob Bloodgood
- * SPDX-License-Identifier: GPL-2.0-only
+ * SPDX-License-Identifier: MIT
  */
 
 import {
@@ -623,7 +623,7 @@ EOF
 <?php
 /**
  * Reference Zikron embed client — OwnMemory sidecar + optional cypher GPU.
- * GPL-2.0-only. Copy into the Zikron plugin and replace file_get_contents
+ * Licensed under the MIT License. Copy into the Zikron plugin and replace file_get_contents
  * with wp_remote_post when inside WordPress.
  */
 declare(strict_types=1);
